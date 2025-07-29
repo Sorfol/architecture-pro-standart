@@ -1,0 +1,30 @@
+@startuml containers_diagram
+!include <C4/C4_Container>
+
+title Диаграмма контейнеров MVP онлайн-депозитов
+
+Person(клиент, "Клиент", "Подает заявку на депозит")
+
+System_Boundary(интернет_банк_boundary, "Интернет-банк") {
+    Container(веб_интерфейс, "Веб-интерфейс", "React.js", "SPA")
+    Container(api_gateway, "API Gateway", ".NET Core", "Маршрутизация запросов")
+    Container(redis, "Кеш ставок", "Redis", "Кеширование данных")
+}
+
+System_Boundary(абс_boundary, "АБС") {
+    Container(модуль_депозитов, "Модуль депозитов", "PL/SQL", "Обработка операций")
+    Container(интеграционный_слой, "Интеграционный слой", "Java", "Внешние API")
+}
+
+System(sms, "SMS-шлюз", "Внешний сервис")
+System(rabbitmq, "RabbitMQ", "Очередь сообщений")
+
+Rel(клиент, веб_интерфейс, "Работает с интерфейсом", "HTTPS")
+Rel(веб_интерфейс, api_gateway, "Вызывает API", "REST")
+Rel(api_gateway, модуль_депозитов, "Отправляет запросы", "REST")
+Rel(api_gateway, rabbitmq, "Помещает задачи в очередь", "AMQP")
+Rel(rabbitmq, интеграционный_слой, "Обрабатывает задачи", "AMQP")
+Rel(интеграционный_слой, модуль_депозитов, "Обновляет данные", "JDBC")
+Rel(модуль_депозитов, sms, "Инициирует SMS", "SOAP")
+Rel(api_gateway, redis, "Кеширует ставки", "RESP")
+@enduml

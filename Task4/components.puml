@@ -1,0 +1,24 @@
+@startuml components_diagram
+!include <C4/C4_Component>
+
+title Компоненты системы передачи ставок
+
+Container_Boundary(абс, "АБС") {
+    Component(модуль_ставок, "Модуль ставок", "PL/SQL", "Расчёт и хранение")
+    Component(api_ставок, "REST API ставок", "Java", "Предоставление данных")
+    Component(sftp_экспорт, "SFTP-экспорт", "Python", "Генерация CSV + PGP")
+}
+
+Container_Boundary(колцентр, "CRM кол-центра") {
+    Component(ui_ставки, "Интерфейс ставок", "React", "Отображение оператору")
+    Component(api_клиент, "API-клиент", "Java", "Запрос к АБС")
+}
+
+System_Ext(партнер, "Партнёрский кол-центр", "SFTP-клиент")
+
+Rel(api_ставок, api_клиент, "JSON", "HTTPS")
+Rel(sftp_экспорт, партнер, "CSV", "SFTP")
+Rel(api_клиент, ui_ставки, "Данные ставок", "Внутренний API")
+Rel(модуль_ставок, api_ставок, "SQL-запрос", "JDBC")
+Rel(модуль_ставок, sftp_экспорт, "Данные", "CSV")
+@enduml
