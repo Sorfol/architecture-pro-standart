@@ -1,0 +1,20 @@
+@startuml components_credit
+!include <C4/C4_Component>
+
+Container_Boundary(интернет_банк, "Интернет-банк") {
+    Component(ui_кредит, "Кредитный UI", "React", "Форма заявки")
+    Component(api_кредит, "Кредитный API", ".NET Core", "Обработка заявок")
+}
+
+Container_Boundary(скоринг, "Сервис скоринга") {
+    Component(ml_модель, "ML-модель", "Python", "Расчет рейтинга")
+    Component(api_бки, "Интеграция с БКИ", "Flask", "REST-клиент")
+}
+
+Container(абс, "АБС", "Oracle", "Хранение данных о клиентах")
+
+Rel(ui_кредит, api_кредит, "Отправка данных", "REST")
+Rel(api_кредит, скоринг, "Запрос скоринга", "REST")
+Rel(ml_модель, api_бки, "Запрос данных", "REST")
+Rel(api_бки, абс, "Проверка внутренней истории", "JDBC")
+@enduml

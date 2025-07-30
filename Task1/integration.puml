@@ -1,0 +1,17 @@
+@startuml
+component "АБС" as abs {
+    [Модуль депозитов] --> [Oracle DB]
+}
+
+component "Интернет-банк" as ib {
+    [API Gateway] --> [Кеш ставок]
+}
+
+component "Кол-центр" as cc {
+    [CRM] --> [API клиент]
+}
+
+abs --> ib : REST (заявки)
+abs --> cc : SOAP (проверка клиентов)
+ib --> abs : JDBC (балансы)
+@enduml
